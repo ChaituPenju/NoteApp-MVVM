@@ -2,14 +2,17 @@ package com.chaitupenjudcoder.notesapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
+import com.chaitupenjudcoder.notesapp.databinding.ActivityAddNoteBinding;
+import com.chaitupenjudcoder.notesapp.models.Note;
 
 public class AddNoteActivity extends AppCompatActivity {
 
@@ -18,29 +21,26 @@ public class AddNoteActivity extends AppCompatActivity {
     public static final String DESCRIPTION_EXTRA = "description";
     public static final String PRIORITY_EXTRA = "priority";
 
-    EditText title, description;
-    NumberPicker priority;
+    private ActivityAddNoteBinding addNoteBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_note);
-
-        title = findViewById(R.id.et_title);
-        description = findViewById(R.id.et_description);
-        priority = findViewById(R.id.np_priority);
-
-        priority.setMinValue(1);
-        priority.setMaxValue(10);
+        addNoteBinding = DataBindingUtil.setContentView(this, R.layout.activity_add_note);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
         Intent intent = getIntent();
         if (intent.hasExtra(ID_EXTRA)) {
             setTitle("Edit Note");
-            title.setText(intent.getStringExtra(TITLE_EXTRA));
-            description.setText(intent.getStringExtra(DESCRIPTION_EXTRA));
-            priority.setValue(intent.getIntExtra(PRIORITY_EXTRA, 1));
+            Note note = new Note(
+                    intent.getStringExtra(TITLE_EXTRA),
+                    intent.getStringExtra(DESCRIPTION_EXTRA),
+                    intent.getIntExtra(PRIORITY_EXTRA, 7)
+            );
+            addNoteBinding.executePendingBindings();
+
+            addNoteBinding.setNote(note);
         } else {
             setTitle("Add Note");
         }
@@ -68,9 +68,9 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void saveItem() {
-        String title1 = title.getText().toString();
-        String desc = description.getText().toString();
-        int priority1 = priority.getValue();
+        String title1 = addNoteBinding.etTitle.getText().toString();
+        String desc = addNoteBinding.etDescription.getText().toString();
+        int priority1 = addNoteBinding.npPriority.getValue();
 
         if (title1.trim().isEmpty() || desc.trim().isEmpty()) {
             Toast.makeText(this, "Please Enter Title and Description", Toast.LENGTH_SHORT).show();

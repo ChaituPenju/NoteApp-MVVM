@@ -2,21 +2,22 @@ package com.chaitupenjudcoder.notesapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.chaitupenjudcoder.notesapp.adapters.NoteListAdapter;
+import com.chaitupenjudcoder.notesapp.databinding.ActivityMainBinding;
+import com.chaitupenjudcoder.notesapp.models.Note;
+import com.chaitupenjudcoder.notesapp.viewmodels.NoteViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.util.List;
 
 import static com.chaitupenjudcoder.notesapp.AddNoteActivity.DESCRIPTION_EXTRA;
 import static com.chaitupenjudcoder.notesapp.AddNoteActivity.ID_EXTRA;
@@ -29,36 +30,34 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton addNoteButton;
     private int ADD_REQUEST_CODE = 1;
     private int EDIT_REQUEST_CODE = 2;
+    private ActivityMainBinding noteBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        noteBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        rv = findViewById(R.id.rv_notes);
-        addNoteButton = findViewById(R.id.fab_addnote);
+        rv = noteBinding.rvNotes;
+        addNoteButton = noteBinding.fabAddnote;
+
+        noteViewModel = new ViewModelProvider(this).get(NoteViewModel.class);
+
+        setupNotesRecyclerView();
+
+        addNoteButton.setOnClickListener(v -> {
+            Intent it = new Intent(MainActivity.this, AddNoteActivity.class);
+            startActivityForResult(it, ADD_REQUEST_CODE);
+        });
+    }
+
+    private void setupNotesRecyclerView() {
+        final NoteListAdapter adapter = new NoteListAdapter();
+
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setHasFixedSize(true);
-
-        addNoteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this, AddNoteActivity.class);
-                startActivityForResult(it, ADD_REQUEST_CODE);
-            }
-        });
-
-        final NoteAdapter adapter = new NoteAdapter();
         rv.setAdapter(adapter);
 
-        noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
-        noteViewModel.getAllNotes().observe(this, new Observer<List<Note>>() {
-            @Override
-            public void onChanged(@Nullable List<Note> notes) {
-                adapter.submitList(notes);
-                //Toast.makeText(MainActivity.this, "onChanged", Toast.LENGTH_SHORT).show();
-            }
-        });
+        noteViewModel.getAllNotes().observe(this, adapter::submitList);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
             @Override
@@ -73,17 +72,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }).attachToRecyclerView(rv);
 
-        adapter.setMyItemClickListener(new NoteAdapter.myItemClickListener() {
-            @Override
-            public void myItemClick(Note note) {
-                Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
-                intent.putExtra(ID_EXTRA, note.getId());
-                intent.putExtra(TITLE_EXTRA, note.getTitle());
-                intent.putExtra(DESCRIPTION_EXTRA, note.getDescription());
-                intent.putExtra(PRIORITY_EXTRA, note.getPriority());
+        adapter.setMyItemClickListener(note -> {
+            Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
+            intent.putExtra(ID_EXTRA, note.getId());
+            intent.putExtra(TITLE_EXTRA, note.getTitle());
+            intent.putExtra(DESCRIPTION_EXTRA, note.getDescription());
+            intent.putExtra(PRIORITY_EXTRA, note.getPriority());
 
-                startActivityForResult(intent, EDIT_REQUEST_CODE);
-            }
+            startActivityForResult(intent, EDIT_REQUEST_CODE);
         });
     }
 

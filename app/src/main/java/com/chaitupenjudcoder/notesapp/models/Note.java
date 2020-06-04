@@ -1,4 +1,4 @@
-package com.chaitupenjudcoder.notesapp;
+package com.chaitupenjudcoder.notesapp.models;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

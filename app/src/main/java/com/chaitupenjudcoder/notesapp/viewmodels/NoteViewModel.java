@@ -1,10 +1,13 @@
-package com.chaitupenjudcoder.notesapp;
+package com.chaitupenjudcoder.notesapp.viewmodels;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+
+import com.chaitupenjudcoder.notesapp.repositories.NoteRepository;
+import com.chaitupenjudcoder.notesapp.models.Note;
 
 import java.util.List;
 

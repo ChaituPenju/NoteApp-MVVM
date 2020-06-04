@@ -1,9 +1,13 @@
-package com.chaitupenjudcoder.notesapp;
+package com.chaitupenjudcoder.notesapp.repositories;
 
 import android.app.Application;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
+
+import com.chaitupenjudcoder.notesapp.roomdb.NoteDao;
+import com.chaitupenjudcoder.notesapp.roomdb.NoteDatabase;
+import com.chaitupenjudcoder.notesapp.models.Note;
 
 import java.util.List;
 
