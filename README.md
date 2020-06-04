@@ -2,30 +2,39 @@
 
 > A simple and minimalistic Notes taking app using LiveData, ViewModel and Room databases in Java
 
+---
+
+****Concepts Covered***
+- MVVM Architecture
+- View Model
+- Live Data
+- Room Database (using Dao)
+
+***App Youtube Link -> https://www.youtube.com/watch?v=JHzTzBLwZQ8***
 
 ## App Screens
 
 ***NotesList***
 
-![NotesApp List](https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesList.gif)
+<img src="https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesList.gif" width=300>
 
 ---
 
 ***Add Notes***
 
-![NotesApp Add Note](https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesAdd.gif)
+<img src="https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesAdd.gif" width=300>
 
 ---
 
 ***Notes Update***
 
-![NotesApp Note UPdate](https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesUpdate.gif)
+<img src="https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesUpdate.gif" width=300>
 
 ---
 
 ***Delete Notes***
 
-![NotesApp List](https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesDeleted.gif)
+<img src="https://raw.githubusercontent.com/ChaituPenju/NoteApp-MVVM/master/screens/NotesDeleted.gif" width=300>
 
 ---
 ## License
