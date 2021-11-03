@@ -5,9 +5,9 @@ import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
+import com.chaitupenjudcoder.notesapp.models.Note;
 import com.chaitupenjudcoder.notesapp.roomdb.NoteDao;
 import com.chaitupenjudcoder.notesapp.roomdb.NoteDatabase;
-import com.chaitupenjudcoder.notesapp.models.Note;
 
 import java.util.List;
 

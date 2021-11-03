@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.chaitupenjudcoder.notesapp.repositories.NoteRepository;
 import com.chaitupenjudcoder.notesapp.models.Note;
+import com.chaitupenjudcoder.notesapp.repositories.NoteRepository;
 
 import java.util.List;
 
