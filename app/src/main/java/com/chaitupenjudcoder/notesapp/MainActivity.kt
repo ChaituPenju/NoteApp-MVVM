@@ -2,37 +2,38 @@ package com.chaitupenjudcoder.notesapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.chaitupenjudcoder.notesapp.AddNoteActivity.Companion.NOTE_EXTRA
 import com.chaitupenjudcoder.notesapp.adapters.NoteListAdapter
 import com.chaitupenjudcoder.notesapp.databinding.ActivityMainBinding
 import com.chaitupenjudcoder.notesapp.models.Note
+import com.chaitupenjudcoder.notesapp.repositories.NoteRepository
+import com.chaitupenjudcoder.notesapp.roomdb.NoteDatabase
+import com.chaitupenjudcoder.notesapp.utils.showToast
 import com.chaitupenjudcoder.notesapp.viewmodels.NoteViewModel
+import com.chaitupenjudcoder.notesapp.viewmodels.ViewModelFactory
 
 class MainActivity: AppCompatActivity() {
+
+    private val db get() = NoteDatabase.getNoteDatabase(context = applicationContext)
+    private val noteViewModel by viewModels<NoteViewModel> { ViewModelFactory(NoteRepository(db.noteDao())) }
 
     companion object {
         private const val ADD_REQUEST_CODE = 1
         private const val EDIT_REQUEST_CODE = 2
     }
 
-    private var noteViewModel: NoteViewModel? = null
-    private lateinit var noteRecyclerView: RecyclerView
     private lateinit var noteBinding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         noteBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        noteRecyclerView = noteBinding.rvNotes
-
-        noteViewModel = ViewModelProvider(this)[NoteViewModel::class.java]
 
         setupNotesRecyclerView()
 
@@ -45,28 +46,27 @@ class MainActivity: AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
-            val title = data!!.getStringExtra(AddNoteActivity.TITLE_EXTRA)
-            val desc = data.getStringExtra(AddNoteActivity.DESCRIPTION_EXTRA)
-            val priority = data.getIntExtra(AddNoteActivity.PRIORITY_EXTRA, 1)
-            val note = Note(title = title, description = desc, priority = priority)
-            noteViewModel!!.insert(note)
-            Toast.makeText(this, "Note Saved!!", Toast.LENGTH_SHORT).show()
-        } else if (requestCode == EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
-            val id = data!!.getIntExtra(AddNoteActivity.ID_EXTRA, -1)
-            if (id == -1) {
-                Toast.makeText(this, "Note can't be updated", Toast.LENGTH_SHORT).show()
-                return
-            }
-            val title = data.getStringExtra(AddNoteActivity.TITLE_EXTRA)
-            val description = data.getStringExtra(AddNoteActivity.DESCRIPTION_EXTRA)
-            val priority = data.getIntExtra(AddNoteActivity.PRIORITY_EXTRA, 1)
-            val note = Note(title = title, description = description, priority = priority)
+        when {
+            requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK -> {
+                data?.getParcelableExtra<Note>(AddNoteActivity.NOTE_EXTRA)?.let { note ->
+                    noteViewModel.insert(note)
+                    showToast("Note Saved!!")
+                } ?: run {
+                    showToast("Note is Empty! Can't Save!")
+                }
 
-            noteViewModel!!.update(note)
-            Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Note Not Saved!!!", Toast.LENGTH_SHORT).show()
+            }
+
+            requestCode == EDIT_REQUEST_CODE && resultCode == RESULT_OK -> {
+                data?.getParcelableExtra<Note>(AddNoteActivity.NOTE_EXTRA)?.let { note ->
+                    noteViewModel.update(note)
+                    showToast("Note updated")
+                } ?: run {
+                    showToast("Note can't be updated")
+                }
+            }
+
+            else -> showToast("Note Not Saved!!!")
         }
     }
 
@@ -75,20 +75,19 @@ class MainActivity: AppCompatActivity() {
             val intent = Intent(
                 this@MainActivity,
                 AddNoteActivity::class.java
-            )
-            intent.putExtra(AddNoteActivity.ID_EXTRA, note.id)
-            intent.putExtra(AddNoteActivity.TITLE_EXTRA, note.title)
-            intent.putExtra(AddNoteActivity.DESCRIPTION_EXTRA, note.description)
-            intent.putExtra(AddNoteActivity.PRIORITY_EXTRA, note.priority)
+            ).apply {
+                putExtra(NOTE_EXTRA, note)
+            }
+
             startActivityForResult(intent, EDIT_REQUEST_CODE)
         }
 
-        noteRecyclerView.apply {
+        noteBinding.rvNotes.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = notesAdapter
         }
 
-        noteViewModel!!.allNotes.observe(this, { list ->
+        noteViewModel.allNotes.observe(this, { list ->
             notesAdapter.submitList(list)
         })
 
@@ -98,14 +97,12 @@ class MainActivity: AppCompatActivity() {
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 viewHolder1: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
+            ) = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, i: Int) {
-                noteViewModel!!.delete(notesAdapter.getNoteAt(viewHolder.adapterPosition))
-                Toast.makeText(this@MainActivity, "Note Deleted", Toast.LENGTH_SHORT).show()
+                noteViewModel.delete(notesAdapter.getNoteAt(viewHolder.adapterPosition))
+                showToast("Note Deleted")
             }
-        }).attachToRecyclerView(noteRecyclerView)
+        }).attachToRecyclerView(noteBinding.rvNotes)
     }
 }

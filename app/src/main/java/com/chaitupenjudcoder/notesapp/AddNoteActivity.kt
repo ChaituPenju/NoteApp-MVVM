@@ -4,21 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.chaitupenjudcoder.notesapp.databinding.ActivityAddNoteBinding
 import com.chaitupenjudcoder.notesapp.models.Note
+import com.chaitupenjudcoder.notesapp.utils.showToast
 
 class AddNoteActivity: AppCompatActivity() {
 
     companion object {
-        public const val ID_EXTRA = "id"
-        public const val TITLE_EXTRA = "title"
-        public const val DESCRIPTION_EXTRA = "description"
-        public const val PRIORITY_EXTRA = "priority"
+        const val NOTE_EXTRA = "note_item"
     }
 
+    private lateinit var note: Note
     private lateinit var addNoteBinding: ActivityAddNoteBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,22 +26,17 @@ class AddNoteActivity: AppCompatActivity() {
 
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
 
-        if (intent.hasExtra(ID_EXTRA)) {
+        if (intent.hasExtra(NOTE_EXTRA)) {
             title = "Edit Note"
-            val note = Note(
-                intent.getStringExtra(TITLE_EXTRA),
-                intent.getStringExtra(DESCRIPTION_EXTRA),
-                intent.getIntExtra(PRIORITY_EXTRA, 7)
-            )
+            note = intent?.getParcelableExtra<Note>(NOTE_EXTRA) ?: Note(id = -1, "", "", 5)
 
             addNoteBinding.executePendingBindings()
 
             addNoteBinding.note = note
         } else {
             title = "Add Note"
+            note = Note(id = -1, "", "", 5)
         }
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -65,23 +58,27 @@ class AddNoteActivity: AppCompatActivity() {
     }
 
     private fun saveItem() {
-        val title1 = addNoteBinding.etTitle.text.toString()
+        val title = addNoteBinding.etTitle.text.toString()
         val desc = addNoteBinding.etDescription.text.toString()
-        val priority1 = addNoteBinding.npPriority.value
+        val priority = addNoteBinding.npPriority.value
 
-        if (title1.trim().isEmpty() || desc.trim().isEmpty()) {
-            Toast.makeText(this, "Please Enter Title and Description", Toast.LENGTH_SHORT).show()
+        if (title.trim().isEmpty() || desc.trim().isEmpty()) {
+            showToast("Please Enter Title and Description")
             return
         }
 
-        val intent = Intent()
-        intent.putExtra(TITLE_EXTRA, title1)
-        intent.putExtra(DESCRIPTION_EXTRA, desc)
-        intent.putExtra(PRIORITY_EXTRA, priority1)
+        val intent = Intent().apply {
+            var editedNote = Note(
+                title = title,
+                description = desc,
+                priority = priority
+            )
 
-        val id = getIntent().getIntExtra(ID_EXTRA, -1)
-        if (id != -1) {
-            intent.putExtra(ID_EXTRA, id)
+            if (note.id != -1) {
+                editedNote = editedNote.copy(id = note.id)
+            } else Unit
+
+            putExtra(NOTE_EXTRA, editedNote)
         }
 
         setResult(RESULT_OK, intent)

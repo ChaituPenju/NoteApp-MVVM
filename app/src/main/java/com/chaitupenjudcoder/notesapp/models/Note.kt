@@ -12,8 +12,4 @@ data class Note(
     val title: String,
     val description: String,
     val priority: Int
-) : Parcelable {
-    constructor(title: String, desc: String, priority: Int) : this(
-        title = title, description = desc, priority = priority
-    )
-}
+) : Parcelable
