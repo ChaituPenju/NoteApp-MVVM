@@ -2,7 +2,6 @@ package com.chaitupenjudcoder.notesapp
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -12,16 +11,13 @@ import com.chaitupenjudcoder.notesapp.AddNoteActivity.Companion.NOTE_EXTRA
 import com.chaitupenjudcoder.notesapp.adapters.NoteListAdapter
 import com.chaitupenjudcoder.notesapp.databinding.ActivityMainBinding
 import com.chaitupenjudcoder.notesapp.models.Note
-import com.chaitupenjudcoder.notesapp.repositories.NoteRepository
-import com.chaitupenjudcoder.notesapp.roomdb.NoteDatabase
 import com.chaitupenjudcoder.notesapp.utils.showToast
 import com.chaitupenjudcoder.notesapp.viewmodels.NoteViewModel
-import com.chaitupenjudcoder.notesapp.viewmodels.ViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity: AppCompatActivity() {
 
-    private val db get() = NoteDatabase.getNoteDatabase(context = applicationContext)
-    private val noteViewModel by viewModels<NoteViewModel> { ViewModelFactory(NoteRepository(db.noteDao())) }
+    private val noteViewModel by viewModel<NoteViewModel>()
 
     companion object {
         private const val ADD_REQUEST_CODE = 1
