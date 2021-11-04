@@ -7,6 +7,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.chaitupenjudcoder.notesapp.models.Note
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Database(entities = [Note::class], version = 1, exportSchema = false)
 abstract class NoteDatabase: RoomDatabase() {
@@ -23,19 +26,27 @@ abstract class NoteDatabase: RoomDatabase() {
                     context.applicationContext,
                     NoteDatabase::class.java,
                     "note_database"
-                ).build()
+                ).addCallback(notesInsertCallback())
+                    .build()
 
                 INSTANCE = instance
 
                 instance
             }
         }
-    }
 
-    private fun roomCallback() = object: RoomDatabase.Callback() {
-        override fun onCreate(@NonNull db: SupportSQLiteDatabase) {
-            super.onCreate(db);
+        private fun notesInsertCallback() = object: RoomDatabase.Callback() {
+            override fun onCreate(@NonNull db: SupportSQLiteDatabase) {
+                super.onCreate(db);
 
+                CoroutineScope(Dispatchers.IO).launch {
+                    INSTANCE?.let {
+                        it.noteDao().insert(Note(title = "Note One", description = "The First Note", priority = 3))
+                        it.noteDao().insert(Note(title = "Note Two", description = "The Second Note", priority = 5))
+                        it.noteDao().insert(Note(title = "Note Three", description = "The Third Note", priority = 4))
+                    }
+                }
+            }
         }
-    };
+    }
 }
