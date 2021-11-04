@@ -9,6 +9,8 @@ class NoteRepository(
 
     fun getAllNotes() = noteDao.getAllNotes()
 
+    fun getNoteById(id: Int) = noteDao.getNoteById(id)
+
     suspend fun insert(note: Note) = noteDao.insert(note)
 
     suspend fun update(note: Note) = noteDao.update(note)

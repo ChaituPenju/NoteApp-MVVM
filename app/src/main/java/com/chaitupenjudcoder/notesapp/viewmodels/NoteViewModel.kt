@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaitupenjudcoder.notesapp.models.Note
 import com.chaitupenjudcoder.notesapp.repositories.NoteRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class NoteViewModel(
@@ -13,6 +14,8 @@ class NoteViewModel(
 
     val allNotes: LiveData<List<Note>>
         get() = repository.getAllNotes()
+
+    fun getNote(id: Int): Flow<Note> = repository.getNoteById(id)
 
 
     fun insert(note: Note) = viewModelScope.launch {

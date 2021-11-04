@@ -7,7 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.chaitupenjudcoder.notesapp.AddNoteActivity.Companion.NOTE_EXTRA
+import com.chaitupenjudcoder.notesapp.AddNoteActivity.Companion.NOTE_ID_EXTRA
 import com.chaitupenjudcoder.notesapp.adapters.NoteListAdapter
 import com.chaitupenjudcoder.notesapp.databinding.ActivityMainBinding
 import com.chaitupenjudcoder.notesapp.models.Note
@@ -72,7 +72,7 @@ class MainActivity: AppCompatActivity() {
                 this@MainActivity,
                 AddNoteActivity::class.java
             ).apply {
-                putExtra(NOTE_EXTRA, note)
+                putExtra(NOTE_ID_EXTRA, note.id)
             }
 
             startActivityForResult(intent, EDIT_REQUEST_CODE)

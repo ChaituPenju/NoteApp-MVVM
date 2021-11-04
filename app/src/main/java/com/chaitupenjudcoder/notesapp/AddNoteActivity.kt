@@ -6,15 +6,22 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.chaitupenjudcoder.notesapp.databinding.ActivityAddNoteBinding
 import com.chaitupenjudcoder.notesapp.models.Note
 import com.chaitupenjudcoder.notesapp.utils.showToast
+import com.chaitupenjudcoder.notesapp.viewmodels.NoteViewModel
+import kotlinx.coroutines.flow.collectLatest
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AddNoteActivity: AppCompatActivity() {
 
     companion object {
         const val NOTE_EXTRA = "note_item"
+        const val NOTE_ID_EXTRA = "note_id"
     }
+
+    private val noteViewModel: NoteViewModel by viewModel()
 
     private lateinit var note: Note
     private lateinit var addNoteBinding: ActivityAddNoteBinding
@@ -26,13 +33,16 @@ class AddNoteActivity: AppCompatActivity() {
 
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
 
-        if (intent.hasExtra(NOTE_EXTRA)) {
+        if (intent.hasExtra(NOTE_ID_EXTRA)) {
             title = "Edit Note"
-            note = intent?.getParcelableExtra<Note>(NOTE_EXTRA) ?: Note(id = -1, "", "", 5)
+            lifecycleScope.launchWhenStarted {
+                noteViewModel.getNote(id = intent.getIntExtra(NOTE_ID_EXTRA, 1)).collectLatest {
+                    note = it
 
-            addNoteBinding.executePendingBindings()
-
-            addNoteBinding.note = note
+                    addNoteBinding.executePendingBindings()
+                    addNoteBinding.note = note
+                }
+            }
         } else {
             title = "Add Note"
             note = Note(id = -1, "", "", 5)

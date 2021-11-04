@@ -7,7 +7,7 @@
 ****Concepts Covered***
 - MVVM Architecture
 - View Model
-- Live Data
+- Live Data & Flow (Recently Added to get single Note)
 - Room Database (using Dao)
 
 ***App Youtube Link -> https://www.youtube.com/watch?v=JHzTzBLwZQ8***
